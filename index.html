@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f12">
+<title>Showroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0f12; --pan:#15181d; --pan2:#1d2128; --ink:#f1f3f5; --mut:#8b95a3; --line:#272c34;
+    --novo:#178a4c; --teste:#c96a00; --show:#2468d8; --neutro:#6b7280;
+    --f-t:"Archivo","Segoe UI",system-ui,sans-serif; --f-c:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#e8eaee; --pan:#ffffff; --pan2:#f0f2f5; --ink:#12151a; --mut:#5c6675; --line:#d9dde3; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.4 var(--f-t); padding-bottom:env(safe-area-inset-bottom,0); }
+  button { font-family:inherit; }
+  button:focus-visible,input:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .wrap { max-width:1200px; margin:0 auto; padding:calc(18px + env(safe-area-inset-top,0)) 20px 70px; }
+
+  /* Cabeçalho */
+  .cab { display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 28px; margin-bottom:22px; }
+  .marca { margin-right:auto; }
+  .marca h1 { margin:0; font:900 clamp(40px,7vw,64px)/.9 var(--f-t); letter-spacing:-.04em; }
+  .marca small { display:block; margin-top:8px; color:var(--mut); font-size:13px; }
+  .abas { display:flex; gap:4px; overflow-x:auto; }
+  .abas button { border:0; background:none; color:var(--mut); font:700 15px var(--f-t); padding:8px 12px; cursor:pointer; white-space:nowrap; border-bottom:3px solid transparent; }
+  .abas button.on { color:var(--ink); border-bottom-color:var(--ink); }
+  .atual { width:40px; height:40px; border-radius:50%; border:1px solid var(--line); background:var(--pan); color:var(--ink); cursor:pointer; display:grid; place-items:center; }
+  .atual svg { width:18px; height:18px; }
+  .atual.gira svg { animation:gira .8s linear infinite; }
+  @keyframes gira { to { transform:rotate(360deg); } }
+
+  /* Contadores */
+  .contadores { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .cont { background:var(--pan); border-radius:18px; padding:16px 18px 18px; border-top:5px solid var(--c); }
+  .cont small { color:var(--mut); font-weight:600; font-size:13px; }
+  .cont b { display:block; font:900 clamp(40px,6vw,64px)/1 var(--f-t); letter-spacing:-.03em; font-variant-numeric:tabular-nums; margin-top:6px; }
+
+  .layout { display:grid; grid-template-columns:390px 1fr; gap:24px; margin-top:24px; align-items:start; }
+  .lado { position:sticky; top:16px; display:grid; gap:18px; }
+  .caixa { background:var(--pan); border-radius:20px; padding:20px; }
+  .caixa h2 { margin:0 0 4px; font:800 22px var(--f-t); letter-spacing:-.01em; }
+  .sub { color:var(--mut); font-size:13px; margin:0 0 14px; }
+  h3.sec { margin:34px 0 4px; font:800 26px var(--f-t); letter-spacing:-.02em; }
+  h3.sec:first-child { margin-top:0; }
+
+  /* Pesquisa */
+  .pq { --pq:var(--teste); border-top:6px solid var(--pq); box-shadow:0 -18px 40px -24px var(--pq); transition:border-color .3s, box-shadow .3s; }
+  .pq[data-modo="novo"] { --pq:var(--novo); }
+  .pq[data-cor="novo"] { --pq:var(--novo); }
+  .pq[data-cor="teste"] { --pq:var(--teste); }
+  .pq[data-cor="show"] { --pq:var(--show); }
+  .modo { display:flex; align-items:center; gap:10px; margin:6px 0 14px; user-select:none; }
+  .modo .op { flex:1; cursor:pointer; color:var(--mut); font:800 15px/1.1 var(--f-t); transition:color .25s; }
+  .modo .op small { display:block; font:500 12px var(--f-t); margin-top:2px; }
+  .modo .op:last-child { text-align:right; }
+  .modo .op.on { color:var(--pq); }
+  .chave { position:relative; width:58px; height:32px; flex:none; border:0; border-radius:99px; padding:0; background:var(--pq); cursor:pointer; transition:background .3s; }
+  .chave i { position:absolute; top:4px; left:4px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,.35); transition:transform .3s cubic-bezier(.3,1.4,.5,1); }
+  .chave[aria-checked="true"] i { transform:translateX(26px); }
+  .slots { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+  .slots input { width:44px; height:58px; padding:0; text-align:center; text-transform:uppercase; font:600 26px var(--f-c); color:var(--ink); background:var(--pan2); border:2px solid var(--line); border-radius:10px; caret-color:var(--pq); transition:border-color .2s, color .2s, box-shadow .2s; }
+  .slots input[hidden] { display:none; }
+  .slots input:focus { outline:none; border-color:var(--pq); box-shadow:0 0 0 4px color-mix(in srgb,var(--pq) 25%,transparent); }
+  .slots input.cheio { border-color:var(--pq); color:var(--pq); }
+  .limpar { margin-top:10px; border:0; background:none; color:var(--mut); font:700 13px var(--f-t); cursor:pointer; padding:6px 0; }
+  .limpar[hidden] { display:none; }
+  .res { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .res[hidden] { display:none; }
+  .res-top { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .res-top span { background:var(--pan2); border-radius:10px; padding:6px 12px; font-size:12px; color:var(--mut); font-weight:600; }
+  .res-top b { display:block; font:800 18px var(--f-t); color:var(--ink); }
+  .res-top .cod b { color:var(--pq); font-family:var(--f-c); }
+  .res-lista { max-height:380px; overflow-y:auto; display:grid; gap:8px; }
+  .rs { background:var(--pan2); border-radius:12px; padding:11px 13px; border-left:5px solid var(--c); }
+  .rs b { display:block; font-size:15px; }
+  .rs small { color:var(--mut); font-size:12.5px; }
+  .vazio { text-align:center; color:var(--mut); padding:16px 6px; font-size:14px; }
+  .vazio b { display:block; color:var(--ink); font-size:16px; margin-bottom:3px; }
+
+  /* Ritmo */
+  .ritmo-n { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .ritmo-n b { font:900 54px/1 var(--f-t); letter-spacing:-.03em; color:var(--teste); }
+  .ritmo-n span { color:var(--mut); font-size:14px; }
+  .ritmo-info { display:grid; gap:0; margin:12px 0; }
+  .ritmo-info div { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:14px; }
+  .ritmo-info dt { color:var(--mut); } .ritmo-info dd { margin:0; font-weight:700; text-align:right; }
+  .faixa { display:grid; grid-template-columns:repeat(auto-fill,minmax(26px,1fr)); gap:4px; }
+  .faixa i { aspect-ratio:1; border-radius:7px; background:var(--pan2); color:var(--mut); font:600 10px/1 var(--f-c); display:grid; place-items:center; font-style:normal; }
+  .faixa i.n1 { background:color-mix(in srgb,var(--teste) 55%,var(--pan)); color:#fff; }
+  .faixa i.n2 { background:var(--teste); color:#fff; }
+  .faixa i.hj { outline:2px solid var(--ink); outline-offset:1px; }
+
+  /* Rotina */
+  .hoje-rotina { display:flex; flex-wrap:wrap; gap:6px 24px; align-items:center; background:var(--ink); color:var(--bg); border-radius:18px; padding:18px 22px; }
+  .hoje-rotina .q { font:800 13px var(--f-t); opacity:.65; }
+  .hoje-rotina .t { font:900 28px/1.1 var(--f-t); letter-spacing:-.02em; }
+  .hoje-rotina .r { margin-left:auto; font-weight:700; text-align:right; }
+  .semana { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0; }
+  .dsem { background:var(--pan); border-radius:16px; padding:16px; border-bottom:4px solid var(--ink); }
+  .dsem small { color:var(--mut); font-weight:700; font-size:12px; }
+  .dsem h4 { margin:2px 0 8px; font:800 20px/1.15 var(--f-t); letter-spacing:-.01em; }
+  .dsem b { font:900 34px/1 var(--f-t); } .dsem span { color:var(--mut); font-size:13px; margin-left:6px; }
+
+  .linha-dia { background:var(--pan); border-radius:16px; margin-bottom:10px; display:grid; grid-template-columns:130px 1fr; overflow:hidden; }
+  .linha-dia .ld { background:var(--pan2); padding:14px 16px; }
+  .linha-dia .ld b { display:block; font:800 18px var(--f-t); }
+  .linha-dia .ld small { color:var(--mut); font-size:13px; }
+  .linha-dia .lc { padding:14px 18px; }
+  .tarefa { display:inline-block; font:700 12.5px var(--f-t); padding:3px 10px; border-radius:99px; border:1.5px solid var(--ink); margin-bottom:8px; }
+  .tarefa.avulsa { border-color:var(--line); color:var(--mut); }
+  .ida { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding:6px 0; }
+  .ida .h { font:600 14px var(--f-c); }
+  .ida small { color:var(--mut); }
+
+  /* Carros */
+  .ferr { display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 16px; align-items:center; }
+  .ferr input { flex:1; min-width:200px; font:500 15px var(--f-t); padding:11px 14px; border-radius:12px; border:2px solid var(--line); background:var(--pan); color:var(--ink); }
+  .filtros { display:flex; gap:8px; flex-wrap:wrap; }
+  .filtros button { border:2px solid var(--line); background:var(--pan); color:var(--ink); border-radius:99px; padding:7px 14px; font:700 14px var(--f-t); cursor:pointer; display:flex; align-items:center; gap:8px; }
+  .filtros button .n { font-size:12px; background:var(--pan2); color:var(--mut); padding:1px 8px; border-radius:99px; }
+  .filtros button.on { border-color:var(--c); background:color-mix(in srgb,var(--c) 18%,var(--pan)); }
+  .filtros button.on .n { background:var(--c); color:#fff; }
+  .grupo { margin-bottom:18px; }
+  .grupo h4 { display:flex; justify-content:space-between; margin:0 0 8px; font:800 15px var(--f-t); color:var(--mut); }
+  .carro { display:grid; grid-template-columns:58px 1fr auto; gap:14px; align-items:center; background:var(--pan); border-radius:14px; padding:12px 16px 12px 14px; margin-bottom:8px; border-left:6px solid var(--c); }
+  .carro .h { font:600 15px var(--f-c); text-align:center; background:var(--pan2); border-radius:9px; padding:7px 0; }
+  .carro .m { font:700 17px var(--f-t); }
+  .carro .d { color:var(--mut); font-size:13.5px; margin-top:2px; }
+  .carro .d b { color:var(--ink); font:600 14px var(--f-c); letter-spacing:.04em; }
+  .carro .q { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .tag { display:inline-block; padding:3px 11px; border-radius:99px; color:#fff; font-size:12.5px; font-weight:800; background:var(--c); }
+  .pessoa { display:inline-block; padding:3px 11px; border-radius:99px; font-size:13px; font-weight:700; background:var(--pan2); border:1.5px solid var(--cor); }
+  .marcas { margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; }
+  .marcas span { font-size:11.5px; font-weight:700; background:var(--pan2); color:var(--mut); padding:2px 9px; border-radius:99px; }
+
+  .msg { background:var(--pan); border:1px dashed var(--line); border-radius:16px; padding:18px; color:var(--mut); margin-top:20px; }
+  .err { border-color:#d04a3c; color:#e0685c; }
+  .link { border:0; background:none; color:var(--ink); font:inherit; font-weight:800; text-decoration:underline; cursor:pointer; }
+
+  @media (max-width:960px) {
+    .layout { grid-template-columns:1fr; } .lado { position:static; }
+    .contadores { grid-template-columns:repeat(2,1fr); }
+  }
+  @media (max-width:640px) {
+    .semana { grid-template-columns:1fr; }
+    .linha-dia { grid-template-columns:1fr; }
+    .carro { grid-template-columns:54px 1fr; } .carro .q { grid-column:1/-1; justify-content:flex-start; }
+    .slots input { width:38px; height:52px; font-size:22px; } .slots { gap:5px; }
+    .hoje-rotina .r { margin-left:0; text-align:left; }
+  }
+  @media (prefers-reduced-motion: reduce) { .atual.gira svg { animation:none; } .chave,.chave i,.pq,.slots input { transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="cab">
+    <div class="marca"><h1>Showroom</h1><small id="atualizado">Carregando…</small></div>
+    <nav class="abas" id="barra" aria-label="Período">
+      <button data-p="hoje">Hoje</button><button data-p="sete">7 dias</button><button data-p="trinta">30 dias</button><button data-p="mes">Este mês</button><button data-p="tudo">Tudo</button>
+    </nav>
+    <button class="atual" id="atualizar" title="Atualizar dados" aria-label="Atualizar dados">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
+  </header>
+
+  <div id="topo"></div>
+
+  <div class="layout">
+    <aside class="lado">
+      <section class="caixa pq" id="pq" data-modo="teste" aria-label="Pesquisar veículo">
+        <h2>Pesquisar veículo</h2>
+        <p class="sub">Placa do test drive ou chassi do carro novo</p>
+        <div class="modo" id="modo">
+          <span class="op" data-m="teste">Test drive<small>7 caracteres</small></span>
+          <button type="button" class="chave" id="chave" role="switch" aria-checked="false" aria-label="Alternar entre test drive e carro novo"><i></i></button>
+          <span class="op" data-m="novo">Carro novo<small>5 caracteres</small></span>
+        </div>
+        <div class="slots" id="slots" role="group" aria-label="Caracteres">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 1">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 2">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 3">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 4">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 5">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 6">
+          <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Caractere 7">
+        </div>
+        <button type="button" class="limpar" id="limpar" hidden>Limpar pesquisa</button>
+        <div class="res" id="res" aria-live="polite" hidden></div>
+      </section>
+      <section class="caixa" id="ritmo"></section>
+    </aside>
+    <main id="conteudo"></main>
+  </div>
+</div>
+
+<script>
+  const DB = "https://controle-de-lavagens-78b2e-default-rtdb.firebaseio.com";
+  const EQUIPE = { Felipe:"#0f766e", Marcos:"#be185d", Jonathan:"#4338ca", Ridelvan:"#c2410c" };
+  const nomes = Object.keys(EQUIPE);
+  const TIPOS = { novo:"Carro novo", teste:"Test drive", show:"Showroom" };
+  const COR = { novo:"#178a4c", teste:"#c96a00", show:"#2468d8" };
+  const ROTINA = { 1:["Segunda","Limpar externo e interno"], 3:["Quarta","Limpar externo e aspirar"], 5:["Sexta","Limpar externo e passar pretinho"] };
+  const PERIODOS = { hoje:"Hoje", sete:"Últimos 7 dias", trinta:"Últimos 30 dias", mes:"Este mês", tudo:"Todo o histórico" };
+  const FUSO = "America/Fortaleza";
+
+  let periodo = "hoje", bruto = null, erro = "", carregando = true, atualizadoEm = null, filtro = "", busca = "";
+  const $ = (s) => document.querySelector(s);
+
+  const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const norm = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  const dataDe = (dia) => { const [a,m,d] = dia.split("-").map(Number); return new Date(a, m-1, d); };
+  const brData = (dia) => dia.split("-").reverse().join("/");
+  const plural = (n, a, b) => n === 1 ? a : b;
+  const tsMs = (ts) => { const n = Number(ts); if (!isFinite(n) || n <= 0) return null; return n < 1e12 ? n*1000 : n; };
+  const hora = (ts) => { const ms = tsMs(ts); return ms === null ? "—" : new Date(ms).toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit", timeZone:FUSO }); };
+  function diaDe(ms) {
+    const f = new Intl.DateTimeFormat("en-CA", { timeZone:FUSO, year:"numeric", month:"2-digit", day:"2-digit" });
+    const p = Object.fromEntries(f.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+    return p.year + "-" + p.month + "-" + p.day;
+  }
+  const hoje = () => diaDe(Date.now());
+  const dow = (dia) => dataDe(dia).getDay();
+  function diaLongo(dia) {
+    const s = dataDe(dia).toLocaleDateString("pt-BR", { weekday:"long" });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  const diffDias = (a, b) => Math.round((dataDe(b) - dataDe(a)) / 86400000);
+
+  async function buscar(caminho) {
+    let r;
+    try { r = await fetch(DB + "/" + caminho + ".json?_=" + Date.now(), { cache:"no-store" }); }
+    catch (e) { throw new Error("Sem conexão com o banco de dados. Verifique a internet."); }
+    if (r.status === 401 || r.status === 403) throw new Error("O banco recusou a leitura. Confira as regras do Firebase.");
+    if (!r.ok) throw new Error("Erro do banco de dados (" + r.status + ").");
+    return (await r.json()) || {};
+  }
+  function reindexar(origem) {
+    const saida = {};
+    if (!origem || typeof origem !== "object") return saida;
+    for (const [gravado, regs] of Object.entries(origem)) {
+      if (!regs || typeof regs !== "object") continue;
+      for (const [id, r] of Object.entries(regs)) {
+        const ms = r && r.ts ? tsMs(r.ts) : null;
+        const dia = ms !== null ? diaDe(ms) : gravado;
+        (saida[dia] = saida[dia] || {})[id] = r;
+      }
+    }
+    return saida;
+  }
+  async function carregar() {
+    carregando = true; erro = "";
+    $("#atualizar").classList.add("gira");
+    render();
+    try {
+      const [lav, sh] = await Promise.all([buscar("lavagens"), buscar("showroom")]);
+      bruto = { lavagens: reindexar(lav), showroom: reindexar(sh) };
+      atualizadoEm = new Date();
+    } catch (e) { erro = e.message; }
+    carregando = false;
+    $("#atualizar").classList.remove("gira");
+    render();
+    if (window.pesquisaRender) pesquisaRender();
+  }
+
+  function inicioDoPeriodo() {
+    const d = dataDe(hoje());
+    if (periodo === "hoje") return iso(d);
+    if (periodo === "sete") { d.setDate(d.getDate() - 6); return iso(d); }
+    if (periodo === "trinta") { d.setDate(d.getDate() - 29); return iso(d); }
+    if (periodo === "mes") { d.setDate(1); return iso(d); }
+    return "0000-00-00";
+  }
+
+  // Todos os registros de carro novo, test drive e showroom (oficina e outros ficam de fora)
+  function todosCarros() {
+    const lista = [];
+    for (const [dia, regs] of Object.entries(bruto.lavagens))
+      for (const [id, r] of Object.entries(regs || {}))
+        if (EQUIPE[r.nome] && TIPOS[r.tipo]) lista.push({ dia, id, ...r });
+    return lista;
+  }
+  function analisar() {
+    const inicio = inicioDoPeriodo();
+    const porTs = (a, b) => (tsMs(a.ts) || 0) - (tsMs(b.ts) || 0);
+    const carros = todosCarros().filter((c) => c.dia >= inicio).sort(porTs);
+    const idas = [];
+    for (const [dia, regs] of Object.entries(bruto.showroom))
+      if (dia >= inicio) for (const [id, r] of Object.entries(regs || {}))
+        if (EQUIPE[r.nome]) idas.push({ dia, id, nome:r.nome, ts:r.ts, detalhe:r.detalhe || "" });
+    idas.sort(porTs);
+    const conta = (t) => carros.filter((c) => c.tipo === t).length;
+    return { carros, idas, novo:conta("novo"), teste:conta("teste"), show:conta("show") };
+  }
+
+  // Ritmo de test drive: sem meta, só mostra a constância
+  function ritmoDados() {
+    const fim = hoje();
+    const teste = {};
+    todosCarros().forEach((c) => { if (c.tipo === "teste") teste[c.dia] = (teste[c.dia] || 0) + 1; });
+    let ini, rotulo = PERIODOS[periodo].toLowerCase();
+    if (periodo === "hoje") { const d = dataDe(fim); d.setDate(d.getDate() - 29); ini = iso(d); rotulo = "últimos 30 dias"; }
+    else ini = inicioDoPeriodo();
+    if (ini === "0000-00-00") ini = Object.keys(teste).sort()[0] || fim;
+    const dias = [];
+    for (let d = dataDe(ini); iso(d) <= fim; d.setDate(d.getDate() + 1)) dias.push(iso(d));
+    const janela = dias.slice(-42);
+    const total = janela.reduce((s, d) => s + (teste[d] || 0), 0);
+    const comTeste = janela.filter((d) => teste[d]).length;
+    const ultimo = Object.keys(teste).sort().pop();
+    return { teste, janela, total, comTeste, ultimo, rotulo, fim };
+  }
+  function renderRitmo() {
+    const R = ritmoDados();
+    const cada = R.total ? (R.janela.length / R.total).toFixed(1).replace(".", ",") : "—";
+    const atras = R.ultimo ? diffDias(R.ultimo, R.fim) : 0;
+    const ult = R.ultimo
+      ? brData(R.ultimo) + (atras === 0 ? " (hoje)" : " (há " + atras + " " + plural(atras, "dia", "dias") + ")")
+      : "—";
+    $("#ritmo").innerHTML = `
+      <h2>Ritmo de test drive</h2>
+      <p class="sub">Acompanhamento. ${esc(R.rotulo.charAt(0).toUpperCase() + R.rotulo.slice(1))}.</p>
+      <div class="ritmo-n"><b>${R.comTeste}</b><span>${plural(R.comTeste, "dia", "dias")} com test drive de ${R.janela.length}</span></div>
+      <dl class="ritmo-info">
+        <div><dt>Test drives lavados</dt><dd>${R.total}</dd></div>
+        <div><dt>Média</dt><dd>${R.total ? "1 a cada " + cada + " dias" : "—"}</dd></div>
+        <div><dt>Último test drive</dt><dd>${ult}</dd></div>
+      </dl>
+      <div class="faixa">${R.janela.map((d) => {
+        const n = R.teste[d] || 0;
+        return `<i class="${n >= 2 ? "n2" : n === 1 ? "n1" : ""}${d === R.fim ? " hj" : ""}" title="${brData(d)} · ${n} test drive${n === 1 ? "" : "s"}">${d.slice(8)}</i>`;
+      }).join("")}</div>`;
+  }
+
+  function render() {
+    document.querySelectorAll("#barra [data-p]").forEach((b) => b.classList.toggle("on", b.dataset.p === periodo));
+    $("#atualizado").textContent = atualizadoEm
+      ? "Atualizado às " + atualizadoEm.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit", timeZone:FUSO })
+      : (carregando ? "Carregando…" : "Sem dados");
+    const alvo = $("#conteudo");
+    if (!bruto) {
+      $("#topo").innerHTML = "";
+      $("#ritmo").innerHTML = "";
+      alvo.innerHTML = carregando
+        ? `<div class="msg" style="margin-top:0">Carregando dados…</div>`
+        : `<div class="msg err" style="margin-top:0">${esc(erro)} <button class="link" id="tentar">Tentar de novo</button></div>`;
+      if ($("#tentar")) $("#tentar").onclick = carregar;
+      return;
+    }
+    const A = analisar();
+    const aviso = erro ? `<div class="msg err" style="margin-top:0">${esc(erro)} Mostrando os últimos dados carregados.</div>` : "";
+    const rot = PERIODOS[periodo].toLowerCase();
+
+    $("#topo").innerHTML = aviso + `
+      <div class="contadores">
+        <div class="cont" style="--c:var(--novo)"><small>Carros novos · ${rot}</small><b>${A.novo}</b></div>
+        <div class="cont" style="--c:var(--teste)"><small>Test drives · ${rot}</small><b>${A.teste}</b></div>
+        <div class="cont" style="--c:var(--show)"><small>Showroom · ${rot}</small><b>${A.show}</b></div>
+        <div class="cont" style="--c:var(--ink)"><small>Idas ao showroom · ${rot}</small><b>${A.idas.length}</b></div>
+      </div>`;
+    renderRitmo();
+
+    // Rotina de hoje / próxima
+    const hj = hoje(), w = dow(hj);
+    const idasHoje = (bruto.showroom[hj] ? Object.values(bruto.showroom[hj]) : []).filter((r) => EQUIPE[r.nome]);
+    let faixaHoje;
+    if (ROTINA[w]) {
+      faixaHoje = `<div class="hoje-rotina"><div><div class="q">Rotina de hoje · ${ROTINA[w][0].toLowerCase()}</div><div class="t">${ROTINA[w][1]}</div></div>
+        <div class="r">${idasHoje.length ? idasHoje.length + " " + plural(idasHoje.length, "ida", "idas") + " hoje" : "Ninguém foi ainda"}</div></div>`;
+    } else {
+      let k = 1; while (!ROTINA[(w + k) % 7]) k++;
+      const prox = ROTINA[(w + k) % 7];
+      faixaHoje = `<div class="hoje-rotina"><div><div class="q">Hoje não tem rotina fixa</div><div class="t">Próxima: ${prox[0].toLowerCase()} · ${prox[1].toLowerCase()}</div></div>
+        <div class="r">${idasHoje.length ? idasHoje.length + " " + plural(idasHoje.length, "ida", "idas") + " hoje" : ""}</div></div>`;
+    }
+    const semana = [1, 3, 5].map((d) => {
+      const n = A.idas.filter((i) => dow(i.dia) === d).length;
+      return `<div class="dsem"><small>${ROTINA[d][0]}</small><h4>${ROTINA[d][1]}</h4><b>${n}</b><span>${plural(n, "ida", "idas")} · ${rot}</span></div>`;
+    }).join("");
+
+    const dias = Array.from(new Set(A.idas.map((i) => i.dia))).sort().reverse();
+    const linhasIda = dias.length ? dias.map((dia) => {
+      const itens = A.idas.filter((i) => i.dia === dia), r = ROTINA[dow(dia)];
+      return `<div class="linha-dia">
+        <div class="ld"><b>${diaLongo(dia)}</b><small>${brData(dia)} · ${itens.length} ${plural(itens.length, "ida", "idas")}</small></div>
+        <div class="lc"><span class="tarefa${r ? "" : " avulsa"}">${r ? r[1] : "Ida avulsa"}</span>
+          ${itens.map((x) => `<div class="ida"><span class="pessoa" style="--cor:${EQUIPE[x.nome]}">${x.nome}</span><span class="h">${hora(x.ts)}</span>${x.detalhe && x.detalhe !== "Apenas check-in" ? `<small>registro: ${esc(x.detalhe)}</small>` : ""}</div>`).join("")}
+        </div></div>`;
+    }).join("") : `<div class="msg" style="margin-top:0">Nenhuma ida ao showroom neste período.</div>`;
+
+    alvo.innerHTML = `
+      <h3 class="sec">Idas ao showroom</h3>
+      <p class="sub">Segunda: limpar externo e interno. Quarta: limpar externo e aspirar. Sexta: limpar externo e passar pretinho.</p>
+      ${faixaHoje}
+      <div class="semana">${semana}</div>
+      ${linhasIda}
+      <h3 class="sec">Carros lavados</h3>
+      <p class="sub">Todo carro novo, test drive e showroom lavado no período. Oficina não aparece aqui.</p>
+      <div id="carrosBloco"></div>`;
+    desenharCarros(A);
+  }
+
+  function desenharCarros(A) {
+    const bloco = $("#carrosBloco");
+    if (!bloco) return;
+    const termo = norm(busca);
+    const lista = A.carros.filter((c) => {
+      if (filtro && c.tipo !== filtro) return false;
+      return !termo || [c.placa, c.carro, c.cor, c.nome, TIPOS[c.tipo], c.observacao].some((v) => norm(v).includes(termo));
+    }).slice().reverse();
+    const chips = [["", "Todos", A.carros.length, "var(--ink)"]].concat(Object.keys(TIPOS).map((k) => [k, TIPOS[k], A[k], COR[k]]))
+      .map(([k, n, q, c]) => `<button type="button" data-f="${k}" class="${filtro === k ? "on" : ""}" style="--c:${c}">${n}<span class="n">${q}</span></button>`).join("");
+    const dias = Array.from(new Set(lista.map((c) => c.dia)));
+    const grupos = dias.length ? dias.map((dia) => {
+      const doDia = lista.filter((c) => c.dia === dia);
+      return `<div class="grupo"><h4><span>${diaLongo(dia)} · ${brData(dia)}</span><span>${doDia.length} ${plural(doDia.length, "carro", "carros")}</span></h4>${doDia.map((c) => {
+        const marcas = [c.pelicula && "Película", c.polimento && "Polimento", c.foraListagem && "Fora da listagem", c.substituido && "Substituído", c.observacao].filter(Boolean);
+        return `<article class="carro" style="--c:${COR[c.tipo]}">
+          <div class="h">${hora(c.ts)}</div>
+          <div><div class="m">${esc(c.carro || "Modelo não registrado")}</div>
+            <div class="d"><b>${esc(c.placa || "-")}</b> · ${esc(c.cor || "cor não informada")}</div>
+            ${marcas.length ? `<div class="marcas">${marcas.map((m) => `<span>${esc(m)}</span>`).join("")}</div>` : ""}</div>
+          <div class="q"><span class="tag">${TIPOS[c.tipo]}</span><span class="pessoa" style="--cor:${EQUIPE[c.nome]}">${c.nome}</span></div>
+        </article>`;
+      }).join("")}</div>`;
+    }).join("") : `<div class="msg" style="margin-top:0">Nenhum carro encontrado neste período.</div>`;
+    bloco.innerHTML = `<div class="ferr"><input id="busca" type="text" placeholder="Filtrar a lista por placa, chassi, modelo, cor…" value="${esc(busca)}" autocomplete="off" spellcheck="false"><div class="filtros">${chips}</div></div>${grupos}`;
+    bloco.querySelectorAll("[data-f]").forEach((b) => { b.onclick = () => { filtro = filtro === b.dataset.f ? "" : b.dataset.f; desenharCarros(A); }; });
+    const campo = $("#busca");
+    campo.oninput = () => { busca = campo.value; const p = campo.selectionStart; desenharCarros(A); const n = $("#busca"); n.focus(); n.setSelectionRange(p, p); };
+  }
+
+  // ============ PESQUISA DE VEÍCULO ============
+  (function () {
+    const caixas = [...document.querySelectorAll("#slots input")];
+    const card = $("#pq");
+    let modo = "teste"; // teste = 7 caracteres (laranja) · novo = 5 caracteres (verde)
+    const tam = () => (modo === "teste" ? 7 : 5);
+    const limpo = (t) => t.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const termo = () => caixas.slice(0, tam()).map((c) => c.value).join("");
+    const mostrar = (h) => { const r = $("#res"); r.hidden = false; r.innerHTML = h; };
+
+    function pesquisaRender() {
+      const t = termo();
+      $("#limpar").hidden = t.length === 0;
+      caixas.forEach((c) => c.classList.toggle("cheio", !!c.value));
+      card.removeAttribute("data-cor");
+      if (!t.length) { $("#res").hidden = true; $("#res").innerHTML = ""; return; }
+      if (t.length < 4) { mostrar(`<div class="vazio">Digite pelo menos 4 caracteres.</div>`); return; }
+      if (!bruto) { mostrar(`<div class="vazio">${carregando ? "Carregando dados…" : esc(erro || "Não foi possível carregar os dados.")}</div>`); return; }
+      const busca = norm(t);
+      const achados = todosCarros().filter((c) => norm(c.placa).includes(busca))
+        .sort((a, b) => (tsMs(b.ts) || 0) - (tsMs(a.ts) || 0));
+      if (!achados.length) {
+        mostrar(`<div class="vazio"><b>Nada encontrado</b>Não há carro novo, test drive ou showroom com ${esc(t)}.</div>`);
+        return;
+      }
+      card.dataset.cor = achados[0].tipo; // novo = verde · test drive = laranja · showroom = azul
+      mostrar(`
+        <div class="res-top">
+          <span>Lavagens<b>${achados.length}</b></span>
+          <span>Última<b>${brData(achados[0].dia)}</b></span>
+          <span class="cod">Busca<b>${esc(t)}</b></span>
+        </div>
+        <div class="res-lista">${achados.map((c) => `
+          <article class="rs" style="--c:${COR[c.tipo]}">
+            <b>${esc(c.carro || "Modelo não registrado")}</b>
+            <small>${brData(c.dia)} às ${hora(c.ts)} · ${esc(c.cor || "sem cor")} · ${esc(c.nome)}</small><br>
+            <small><span class="tag" style="--c:${COR[c.tipo]}">${TIPOS[c.tipo]}</span> ${esc(c.placa || "")}</small>
+          </article>`).join("")}</div>`);
+    }
+    window.pesquisaRender = pesquisaRender;
+
+    function aplicarModo() {
+      const n = tam();
+      card.dataset.modo = modo;
+      $("#chave").setAttribute("aria-checked", modo === "novo" ? "true" : "false");
+      document.querySelectorAll("#modo .op").forEach((o) => o.classList.toggle("on", o.dataset.m === modo));
+      caixas.forEach((c, i) => { c.hidden = i >= n; if (i >= n) c.value = ""; });
+      pesquisaRender();
+    }
+    function alternar(novo) {
+      modo = novo || (modo === "teste" ? "novo" : "teste");
+      aplicarModo();
+      (caixas.find((c, i) => i < tam() && !c.value) || caixas[tam() - 1]).focus();
+    }
+    function preencher(inicio, texto) {
+      const l = limpo(texto);
+      if (!l) return;
+      const dados = l.length > tam() && inicio === 0 ? l.slice(-tam()) : l; // chassi completo: usa os últimos caracteres
+      for (let k = 0; k < dados.length && inicio + k < tam(); k++) caixas[inicio + k].value = dados[k];
+      caixas[Math.min(inicio + dados.length, tam() - 1)].focus();
+      pesquisaRender();
+    }
+    caixas.forEach((c, i) => {
+      c.addEventListener("input", () => { const v = limpo(c.value); c.value = ""; if (v) preencher(i, v); else pesquisaRender(); });
+      c.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !c.value && i > 0) { caixas[i-1].value = ""; caixas[i-1].focus(); pesquisaRender(); e.preventDefault(); }
+        else if (e.key === "ArrowLeft" && i > 0) caixas[i-1].focus();
+        else if (e.key === "ArrowRight" && i < tam() - 1) caixas[i+1].focus();
+      });
+      c.addEventListener("paste", (e) => { e.preventDefault(); preencher(i, (e.clipboardData || window.clipboardData).getData("text")); });
+      c.addEventListener("focus", () => c.select());
+    });
+    $("#limpar").onclick = () => { caixas.forEach((c) => { c.value = ""; }); caixas[0].focus(); pesquisaRender(); };
+    $("#chave").onclick = () => alternar();
+    document.querySelectorAll("#modo .op").forEach((o) => { o.onclick = () => alternar(o.dataset.m); });
+    aplicarModo();
+  })();
+
+  document.querySelectorAll("#barra [data-p]").forEach((b) => { b.onclick = () => { periodo = b.dataset.p; render(); }; });
+  $("#atualizar").onclick = carregar;
+  carregar();
+  let diaVisivel = hoje();
+  setInterval(() => { const n = hoje(); if (n !== diaVisivel) { diaVisivel = n; carregar(); } }, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && !carregando) carregar(); });
+</script>
+</body>
+</html>
